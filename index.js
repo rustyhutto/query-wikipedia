@@ -26,7 +26,7 @@ app.listen(port, function() {
 
 function queryWikipedia(query, cb) {
     //The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
-    path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&titles=' + query
+    path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
     console.log("path ", path)
     var options = {
         host: 'en.wikipedia.org',

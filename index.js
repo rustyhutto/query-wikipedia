@@ -12,7 +12,7 @@ app.use(function(req, res, next) {
 
 
 app.get('/', function(req, res) {
-    // console.log(req.query['params'])
+    console.log("query: " + req.query['params'])
     query = req.query['params']
     // console.log("query ", query)
 

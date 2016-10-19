@@ -1,0 +1,1 @@
+https://query-wikipedia.herokuapp.com/

@@ -14,13 +14,17 @@ app.get('/', function(req, res) {
     query = req.query['params']
 
     console.log("hit /, query is ", query)
+    // console.log(res)
 
-    queryWiki(query, processData)
+    // res.send("query was = " + query)
+    // queryWiki(query, processText.bind(null, res))
+    queryWiki(query, processText)
 
 });
 
 function queryWiki(query, cb) {
     //The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
+    console.log(cb)
     console.log("inside queryWiki, query=" + query)
 
     path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
@@ -28,8 +32,8 @@ function queryWiki(query, cb) {
         host: 'en.wikipedia.org',
         path: path
     };
-
-    callback = function(response) {
+    https.request(options, callback).end();
+    function callback(response) {
         var str = '';
         response.on('data', function(chunk) {
             str += chunk;
@@ -38,26 +42,27 @@ function queryWiki(query, cb) {
             obj = JSON.parse(str)
             var text = obj.query.pages[Object.keys(obj.query.pages)[0]].extract
             console.log("inside queryWiki callback, text is: ", text)
-            cb(text)
+            cb(text, sendProcessedText)
         });
     }
-    https.request(options, callback).end();
 }
 
-function processData(data, cb) {
-
+function processText(text, cb) {
+  console.log("inside processText text="+text)
+  console.log(cb)
+  deleteAroundParenthesis(text, cb)
 }
 
-function processText(data, cb) {
-  deleteAroundParenthesis(data, cb)
+function sendProcessedText(processedText, cb) {
+  console.log("inside sendProcessedText, processedText="+processedText)
+  // res.send(processedText)
 }
-
 
 function deleteAroundParenthesis(str, cb) {
     var re = / \(.*\)/
-    var stripped = str.replace(re, "")
-    console.log("inside stripSpecialChars stripped is: " + stripped)
-    cb(stripped)
+    var processedText = str.replace(re, "")
+    console.log("inside deleteAroundParenthesis stripped is: " + processedText)
+    cb(processedText, cb)
 }
 
 var port = process.argv[2] || process.env.PORT || 3000;

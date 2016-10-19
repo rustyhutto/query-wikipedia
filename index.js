@@ -12,18 +12,7 @@ app.use(function(req, res, next) {
 
 
 app.get('/', function(req, res) {
-    // console.log(req.query['params'])
-    query = req.query['params']
-    console.log("query ", query)
-
-    queryWikipedia(query, function(text) {
-        console.log("inside cb ", text.substring(0, 15))
-        stripSpecialChars(text, function(stripped){
-        res.send(stripped)
-        })
-    })
-
-    // res.send("hello world");
+  res.send('GET /query_wikipedia?params=QUERY')
 });
 
 var port = process.argv[2] || process.env.PORT || 3000;

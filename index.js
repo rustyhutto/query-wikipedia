@@ -23,33 +23,25 @@ function queryWiki(query, cb) {
     //The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
     console.log("inside queryWiki, query=" + query)
 
-    // path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
-    // // console.log("path ", path)
-    // var options = {
-    //     host: 'en.wikipedia.org',
-    //     path: path
-    // };
-    //
-    // callback = function(response) {
-    //     var str = '';
-    //     //another chunk of data has been recieved, so append it to `str`
-    //     response.on('data', function(chunk) {
-    //         str += chunk;
-    //     });
-    //     //the whole response has been recieved, so we just print it out here
-    //     response.on('end', function() {
-    //         // console.log("inside https.request callback ", str.substring(0, 15));
-    //         // console.log("typeof ", typeof str)
-    //         // console.log("typeof ", typeof JSON.parse(str))
-    //         obj = JSON.parse(str)
-    //         // console.log(obj)
-    //         // console.log("text? ", obj.query.pages[Object.keys(obj.query.pages)[0]].extract)
-    //         var text = obj.query.pages[Object.keys(obj.query.pages)[0]].extract
-    //         console.log("inside queryWiki callback, text is: ", text)
-    //         cb(text)
-    //     });
-    // }
-    // https.request(options, callback).end();
+    path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
+    var options = {
+        host: 'en.wikipedia.org',
+        path: path
+    };
+
+    callback = function(response) {
+        var str = '';
+        response.on('data', function(chunk) {
+            str += chunk;
+        });
+        response.on('end', function() {
+            obj = JSON.parse(str)
+            var text = obj.query.pages[Object.keys(obj.query.pages)[0]].extract
+            console.log("inside queryWiki callback, text is: ", text)
+            cb(text)
+        });
+    }
+    https.request(options, callback).end();
 }
 
 function processData(data, cb) {

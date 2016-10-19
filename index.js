@@ -10,62 +10,62 @@ app.use(function(req, res, next) {
   next();
 });
 
+
 app.get('/', function(req, res) {
+    // console.log(req.query['params'])
     query = req.query['params']
+    // console.log("query ", query)
 
-    console.log("hit /, query is ", query)
-    // console.log(res)
+    queryWikipedia(query, function(text) {
+        // console.log("inside cb ", text.substring(0, 15))
+        stripSpecialChars(text, function(stripped){
+        res.send(stripped)
+        })
+    })
 
-    // res.send("query was = " + query)
-    // queryWiki(query, processText.bind(null, res))
-    queryWiki(query, processText)
-
+    // res.send("hello world");
 });
-
-function queryWiki(query, cb) {
-    //The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
-    console.log(cb)
-    console.log("inside queryWiki, query=" + query)
-
-    path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
-    var options = {
-        host: 'en.wikipedia.org',
-        path: path
-    };
-    https.request(options, callback).end();
-    function callback(response) {
-        var str = '';
-        response.on('data', function(chunk) {
-            str += chunk;
-        });
-        response.on('end', function() {
-            obj = JSON.parse(str)
-            var text = obj.query.pages[Object.keys(obj.query.pages)[0]].extract
-            console.log("inside queryWiki callback, text is: ", text)
-            cb(text, sendProcessedText)
-        });
-    }
-}
-
-function processText(text, cb) {
-  console.log("inside processText text="+text)
-  console.log(cb)
-  deleteAroundParenthesis(text, cb)
-}
-
-function sendProcessedText(processedText, cb) {
-  console.log("inside sendProcessedText, processedText="+processedText)
-  // res.send(processedText)
-}
-
-function deleteAroundParenthesis(str, cb) {
-    var re = / \(.*\)/
-    var processedText = str.replace(re, "")
-    console.log("inside deleteAroundParenthesis stripped is: " + processedText)
-    cb(processedText, cb)
-}
 
 var port = process.argv[2] || process.env.PORT || 3000;
 app.listen(port, function() {
     console.log('Example app listening on port ' + port);
 });
+
+
+function queryWikipedia(query, cb) {
+    //The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
+    path = '/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=' + query
+    // console.log("path ", path)
+    var options = {
+        host: 'en.wikipedia.org',
+        path: path
+    };
+
+    callback = function(response) {
+        var str = '';
+        //another chunk of data has been recieved, so append it to `str`
+        response.on('data', function(chunk) {
+            str += chunk;
+        });
+        //the whole response has been recieved, so we just print it out here
+        response.on('end', function() {
+            // console.log("inside https.request callback ", str.substring(0, 15));
+            // console.log("typeof ", typeof str)
+            // console.log("typeof ", typeof JSON.parse(str))
+            obj = JSON.parse(str)
+            // console.log(obj)
+            // console.log("text? ", obj.query.pages[Object.keys(obj.query.pages)[0]].extract)
+            text = obj.query.pages[Object.keys(obj.query.pages)[0]].extract
+            cb(text)
+        });
+    }
+    https.request(options, callback).end();
+}
+
+
+function stripSpecialChars(str, cb) {
+    var re = / \(.*\)/
+    // console.log(str.replace(re, ""))
+    var stripped = str.replace(re, "")
+    cb(stripped)
+}
